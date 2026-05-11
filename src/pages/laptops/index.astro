@@ -159,6 +159,16 @@ const grid = document.getElementById('product-grid')!;
 let activeBrand = 'All';
 let activeSort = 'featured';
 
+// Read brand filter from URL query param (e.g. /laptops?brand=HP)
+const urlParams = new URLSearchParams(location.search);
+const urlBrand = urlParams.get('brand');
+if (urlBrand && ['HP', 'Lenovo', 'Dell'].includes(urlBrand)) {
+  activeBrand = urlBrand;
+  pills.forEach(p => {
+    p.classList.toggle('active', p.dataset.brand === urlBrand);
+  });
+}
+
 function applyFilters() {
   const visible: HTMLElement[] = [];
   cards.forEach(card => {
@@ -199,4 +209,9 @@ sortSelect.addEventListener('change', () => {
   activeSort = sortSelect.value;
   applyFilters();
 });
+
+// Apply initial filter (handles ?brand= URL param)
+if (activeBrand !== 'All') {
+  applyFilters();
+}
 </script>
