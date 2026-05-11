@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Page Not Found | Bluebird Electronics">
+  <Header />
+  <main style="max-width:1280px;margin:0 auto;padding:80px 24px;text-align:center">
+    <h1 style="font-size:48px;font-weight:900;color:var(--text);margin-bottom:16px">404</h1>
+    <p style="font-size:18px;color:var(--muted);margin-bottom:32px">That page doesn't exist.</p>
+    <a href="/laptops" class="btn-primary">Browse Laptops</a>
+  </main>
+  <Footer />
+</BaseLayout>
