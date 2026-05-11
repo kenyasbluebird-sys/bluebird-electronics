@@ -1,0 +1,202 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import ProductCard from '../../components/ProductCard.astro';
+
+const allLaptops = await getCollection('laptops');
+const laptops = allLaptops.map(entry => {
+  const parts = entry.id.split('/');
+  const brand = parts[0]!;
+  const slug = parts.slice(1).join('/');
+  return {
+    ...entry.data,
+    href: `/laptops/${brand}/${slug}`,
+    id: entry.id,
+  };
+}).sort((a, b) => b.price - a.price);
+
+const brands = ['All', 'HP', 'Lenovo', 'Dell'];
+---
+
+<BaseLayout
+  title="Buy Laptops in Kenya – Refurbished HP, Dell, Lenovo | Bluebird Electronics"
+  description="Browse 20+ refurbished business laptops in Kenya. HP, Dell, Lenovo. Tested and verified. Pay via M-Pesa. Same-day delivery in Nairobi."
+>
+  <Header />
+
+  <main>
+    <section class="category-hero">
+      <div class="category-hero-inner">
+        <h1>Laptops in Kenya</h1>
+        <p>Refurbished business-grade laptops — tested, verified, and priced well below Nairobi retail.</p>
+      </div>
+    </section>
+
+    <div class="filters" id="shop">
+      <div class="brand-pills" id="brand-pills">
+        {brands.map(b => (
+          <button class={`pill ${b === 'All' ? 'active' : ''}`} data-brand={b}>{b}</button>
+        ))}
+      </div>
+      <div class="filter-spacer"></div>
+      <div class="select-wrap">
+        <select id="sort-select" class="filter-select">
+          <option value="featured">Featured</option>
+          <option value="price-low">Price: Low → High</option>
+          <option value="price-high">Price: High → Low</option>
+        </select>
+        <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <div class="products-info">
+      <span id="count-label"><strong>{laptops.length}</strong> laptops found</span>
+    </div>
+
+    <div class="grid" id="product-grid">
+      {laptops.map(laptop => (
+        <ProductCard
+          brand={laptop.brand}
+          model={laptop.model}
+          cpu={laptop.cpu}
+          ram={laptop.ram}
+          storage={laptop.storage}
+          screen={laptop.screen}
+          price={laptop.price}
+          tag={laptop.tag}
+          touch={laptop.touch}
+          graphics={laptop.graphics}
+          image={laptop.image}
+          href={laptop.href}
+        />
+      ))}
+    </div>
+  </main>
+
+  <Footer />
+  <WhatsAppButton />
+</BaseLayout>
+
+<style>
+.category-hero {
+  background: linear-gradient(160deg, #0a1628 0%, var(--bg) 60%);
+  border-bottom: 1px solid var(--bdr);
+  padding: 48px 24px 40px;
+}
+.category-hero-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.category-hero h1 {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, #94b8db 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+.category-hero p { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+.filters {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 24px 0;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.brand-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  padding: 9px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--bdr);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.pill.active { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.12); color: var(--blue-b); }
+.filter-spacer { flex: 1; }
+.select-wrap { position: relative; }
+.filter-select {
+  appearance: none;
+  padding: 9px 32px 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--bdr);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  outline: none;
+}
+.select-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--dim); }
+.products-info { max-width: 1280px; margin: 0 auto; padding: 16px 24px 0; font-size: 13px; color: var(--dim); }
+.products-info strong { color: var(--muted); }
+.grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+</style>
+
+<script>
+const cards = document.querySelectorAll<HTMLElement>('.card');
+const pills = document.querySelectorAll<HTMLButtonElement>('.pill');
+const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+const countLabel = document.getElementById('count-label')!;
+const grid = document.getElementById('product-grid')!;
+
+let activeBrand = 'All';
+let activeSort = 'featured';
+
+function applyFilters() {
+  const visible: HTMLElement[] = [];
+  cards.forEach(card => {
+    const brand = card.dataset.brand ?? '';
+    const show = activeBrand === 'All' || brand === activeBrand;
+    card.style.display = show ? '' : 'none';
+    if (show) visible.push(card);
+  });
+
+  if (activeSort === 'price-low') {
+    visible.sort((a, b) => {
+      const pa = parseFloat(a.querySelector('.card-price')!.textContent!.replace(/[^0-9.]/g, ''));
+      const pb = parseFloat(b.querySelector('.card-price')!.textContent!.replace(/[^0-9.]/g, ''));
+      return pa - pb;
+    });
+  } else if (activeSort === 'price-high') {
+    visible.sort((a, b) => {
+      const pa = parseFloat(a.querySelector('.card-price')!.textContent!.replace(/[^0-9.]/g, ''));
+      const pb = parseFloat(b.querySelector('.card-price')!.textContent!.replace(/[^0-9.]/g, ''));
+      return pb - pa;
+    });
+  }
+
+  visible.forEach(card => grid.appendChild(card));
+  countLabel.innerHTML = `<strong>${visible.length}</strong> laptop${visible.length !== 1 ? 's' : ''} found`;
+}
+
+pills.forEach(pill => {
+  pill.addEventListener('click', () => {
+    pills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeBrand = pill.dataset.brand ?? 'All';
+    applyFilters();
+  });
+});
+
+sortSelect.addEventListener('change', () => {
+  activeSort = sortSelect.value;
+  applyFilters();
+});
+</script>
