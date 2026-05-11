@@ -1,0 +1,106 @@
+---
+const TAG_COLORS: Record<string, { bg: string; c: string; bd: string }> = {
+  "Premium":        { bg: "rgba(245,180,50,0.1)",  c: "#f5b432", bd: "rgba(245,180,50,0.2)"  },
+  "Best Value":     { bg: "rgba(16,185,129,0.1)",  c: "#10b981", bd: "rgba(16,185,129,0.2)"  },
+  "Budget Friendly":{ bg: "rgba(59,130,246,0.1)",  c: "#60a5fa", bd: "rgba(59,130,246,0.2)"  },
+  "Touchscreen":    { bg: "rgba(168,85,247,0.1)",  c: "#a855f7", bd: "rgba(168,85,247,0.2)"  },
+  "Graphics":       { bg: "rgba(239,68,68,0.1)",   c: "#ef4444", bd: "rgba(239,68,68,0.2)"   },
+  "2-in-1":         { bg: "rgba(6,182,212,0.1)",   c: "#06b6d4", bd: "rgba(6,182,212,0.2)"   },
+  "32GB RAM":       { bg: "rgba(245,180,50,0.1)",  c: "#f5b432", bd: "rgba(245,180,50,0.2)"  },
+  "Latest Gen":     { bg: "rgba(16,185,129,0.1)",  c: "#10b981", bd: "rgba(16,185,129,0.2)"  },
+  "Compact":        { bg: "rgba(129,140,248,0.1)", c: "#818cf8", bd: "rgba(129,140,248,0.2)" },
+  "Popular":        { bg: "rgba(251,146,60,0.1)",  c: "#fb923c", bd: "rgba(251,146,60,0.2)"  },
+};
+
+interface Props {
+  brand: string;
+  model: string;
+  cpu: string;
+  ram: string;
+  storage: string;
+  screen: string;
+  price: number;
+  tag?: string;
+  touch?: boolean;
+  graphics?: string;
+  image: string;
+  href: string;
+}
+
+const { brand, model, cpu, ram, storage, screen, price, tag = '', touch = false, graphics = '', image, href } = Astro.props;
+const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+const tagStyle = tag && TAG_COLORS[tag] ? `background:${TAG_COLORS[tag].bg};color:${TAG_COLORS[tag].c};border:1px solid ${TAG_COLORS[tag].bd}` : '';
+---
+
+<a href={href} class="card" data-brand={brand}>
+  <div class="card-img">
+    <img src={image} alt={`${brand} ${model}`} loading="lazy" width="280" height="168" />
+  </div>
+  <div class="card-body">
+    <div class="card-tags">
+      {tag && <span class="tag" style={tagStyle}>{tag}</span>}
+      {touch && tag !== 'Touchscreen' && <span class="tag" style="background:rgba(168,85,247,0.08);color:#a855f7;border:1px solid rgba(168,85,247,0.15)">Touch</span>}
+    </div>
+    <div class="card-brand">{brand}</div>
+    <div class="card-model">{model}</div>
+    <div class="card-specs">
+      <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-value">{cpu}</span></div>
+      <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-value">{ram}</span></div>
+      <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-value">{storage}</span></div>
+      <div class="spec-row"><span class="spec-label">Screen</span><span class="spec-value">{screen}</span></div>
+      {graphics && <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-value">{graphics}</span></div>}
+    </div>
+    <div class="card-footer">
+      <span class="card-price">{fmt(price)}</span>
+      <span class="card-cta">View →</span>
+    </div>
+  </div>
+</a>
+
+<style>
+.card {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  text-decoration: none;
+}
+.card:hover {
+  background: var(--card-h);
+  border-color: var(--bdr-h);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(59,130,246,0.1);
+}
+.card-img {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(59,130,246,0.03), rgba(0,0,0,0.25));
+  border-bottom: 1px solid var(--bdr);
+  padding: 16px;
+}
+.card-img img {
+  max-height: 168px;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+  transition: transform 0.35s ease;
+}
+.card:hover .card-img img { transform: scale(1.04); }
+.card-body { padding: 16px; display: flex; flex-direction: column; flex: 1; gap: 8px; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; min-height: 22px; }
+.card-brand { font-size: 11px; font-weight: 700; color: var(--blue-b); font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.card-model { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.card-specs { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.spec-row { display: flex; justify-content: space-between; }
+.spec-label { font-size: 12px; color: var(--dim); }
+.spec-value { font-size: 12px; color: var(--muted); font-family: var(--mono); font-weight: 600; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--bdr); }
+.card-price { font-size: 18px; font-weight: 900; font-family: var(--mono); background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.card-cta { font-size: 13px; font-weight: 700; color: var(--muted); transition: color 0.2s; }
+.card:hover .card-cta { color: var(--blue-b); }
+</style>
