@@ -1,0 +1,80 @@
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Tokens ── */
+:root {
+  --bg: #06080d;
+  --card: #0c0f16;
+  --card-h: #10141d;
+  --bdr: rgba(100, 160, 255, 0.08);
+  --bdr-h: rgba(80, 140, 255, 0.22);
+  --blue: #3b82f6;
+  --blue-g: rgba(59, 130, 246, 0.15);
+  --blue-b: #60a5fa;
+  --orange: #f97316;
+  --green: #10b981;
+  --text: #e8edf5;
+  --muted: rgba(200, 215, 240, 0.45);
+  --dim: rgba(200, 215, 240, 0.25);
+  --font: 'Outfit', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, select, button { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+::placeholder { color: var(--dim); }
+select option { background: #111; color: #ccc; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+/* ── Shared buttons ── */
+.btn-primary {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(59,130,246,0.4); }
+
+.btn-secondary {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--bdr);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: inline-block;
+}
+.btn-secondary:hover { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
+
+/* ── Tag chips ── */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
