@@ -1,0 +1,67 @@
+---
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Bluebird Electronics</div>
+      <p class="footer-tagline">Premium refurbished laptops. Delivered across Kenya.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <div class="footer-col-title">Shop</div>
+        <a href="/laptops">All Laptops</a>
+        <a href="/laptops?brand=HP">HP</a>
+        <a href="/laptops?brand=Lenovo">Lenovo</a>
+        <a href="/laptops?brand=Dell">Dell</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Contact</div>
+        <a href="tel:+254700000000">0700 000 000</a>
+        <a href="mailto:hello@bluebirdelectronics.com">hello@bluebirdelectronics.com</a>
+        <a href="https://wa.me/254700000000" target="_blank" rel="noopener">WhatsApp Us</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Info</div>
+        <a href="/laptops">Nairobi, Kenya</a>
+        <span>M-Pesa · Visa · Airtel Money</span>
+        <span>30-Day Warranty</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© {new Date().getFullYear()} Bluebird Electronics. All rights reserved.</span>
+  </div>
+</footer>
+
+<style>
+.footer {
+  background: var(--card);
+  border-top: 1px solid var(--bdr);
+  margin-top: 80px;
+}
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.footer-brand { flex: 1; min-width: 200px; }
+.footer-logo { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.footer-tagline { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.footer-links { display: flex; gap: 40px; flex-wrap: wrap; }
+.footer-col { display: flex; flex-direction: column; gap: 10px; min-width: 120px; }
+.footer-col-title { font-size: 12px; font-weight: 700; color: var(--blue-b); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+.footer-col a, .footer-col span { font-size: 14px; color: var(--muted); transition: color 0.2s; }
+.footer-col a:hover { color: var(--text); }
+.footer-bottom {
+  border-top: 1px solid var(--bdr);
+  text-align: center;
+  padding: 16px 24px;
+  font-size: 12px;
+  color: var(--dim);
+}
+</style>
