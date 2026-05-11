@@ -1,0 +1,241 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import WhatsAppButton from '../../../components/WhatsAppButton.astro';
+
+export async function getStaticPaths() {
+  const laptops = await getCollection('laptops');
+  return laptops.map(entry => {
+    const parts = entry.id.split('/');
+    const brand = parts[0]!;
+    const slug = parts.slice(1).join('/');
+    return {
+      params: { brand, slug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+
+const TAG_COLORS: Record<string, { bg: string; c: string; bd: string }> = {
+  "Premium":        { bg: "rgba(245,180,50,0.1)",  c: "#f5b432", bd: "rgba(245,180,50,0.2)"  },
+  "Best Value":     { bg: "rgba(16,185,129,0.1)",  c: "#10b981", bd: "rgba(16,185,129,0.2)"  },
+  "Budget Friendly":{ bg: "rgba(59,130,246,0.1)",  c: "#60a5fa", bd: "rgba(59,130,246,0.2)"  },
+  "Touchscreen":    { bg: "rgba(168,85,247,0.1)",  c: "#a855f7", bd: "rgba(168,85,247,0.2)"  },
+  "Graphics":       { bg: "rgba(239,68,68,0.1)",   c: "#ef4444", bd: "rgba(239,68,68,0.2)"   },
+  "2-in-1":         { bg: "rgba(6,182,212,0.1)",   c: "#06b6d4", bd: "rgba(6,182,212,0.2)"   },
+  "32GB RAM":       { bg: "rgba(245,180,50,0.1)",  c: "#f5b432", bd: "rgba(245,180,50,0.2)"  },
+  "Latest Gen":     { bg: "rgba(16,185,129,0.1)",  c: "#10b981", bd: "rgba(16,185,129,0.2)"  },
+  "Compact":        { bg: "rgba(129,140,248,0.1)", c: "#818cf8", bd: "rgba(129,140,248,0.2)" },
+  "Popular":        { bg: "rgba(251,146,60,0.1)",  c: "#fb923c", bd: "rgba(251,146,60,0.2)"  },
+};
+
+const waText = `Hi! I'm interested in the ${d.brand} ${d.model} (${fmt(d.price)}). Is it available?`;
+const metaTitle = d.metaTitle ?? `${d.brand} ${d.model} – ${fmt(d.price)} | Bluebird Electronics Kenya`;
+const metaDesc = d.metaDescription ?? `Buy ${d.brand} ${d.model} in Kenya for ${fmt(d.price)}. ${d.cpu}, ${d.ram}, ${d.storage}. Tested and verified. Pay via M-Pesa.`;
+
+const specs = [
+  { label: 'Screen', value: d.screen },
+  { label: 'CPU', value: d.cpu },
+  { label: 'RAM', value: d.ram },
+  { label: 'Storage', value: d.storage },
+  ...(d.graphics ? [{ label: 'GPU', value: d.graphics }] : []),
+  ...(d.gen ? [{ label: 'Gen', value: d.gen }] : []),
+  { label: 'Touchscreen', value: d.touch ? 'Yes' : 'No' },
+  { label: 'Condition', value: 'Refurbished – Grade A' },
+  { label: 'Warranty', value: '30 Days' },
+];
+
+const tagStyle = d.tag && TAG_COLORS[d.tag]
+  ? `background:${TAG_COLORS[d.tag].bg};color:${TAG_COLORS[d.tag].c};border:1px solid ${TAG_COLORS[d.tag].bd}`
+  : '';
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": `${d.brand} ${d.model}`,
+  "image": Astro.site ? new URL(d.image, Astro.site).href : d.image,
+  "description": metaDesc,
+  "brand": { "@type": "Brand", "name": d.brand },
+  "offers": {
+    "@type": "Offer",
+    "url": Astro.url.href,
+    "priceCurrency": "KES",
+    "price": d.price,
+    "availability": "https://schema.org/InStock",
+    "seller": { "@type": "Organization", "name": "Bluebird Electronics" },
+  },
+});
+---
+
+<BaseLayout title={metaTitle} description={metaDesc} ogImage={d.image}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd} />
+
+  <Header />
+
+  <main class="product-page">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <div class="breadcrumb-inner">
+        <a href="/laptops">Laptops</a>
+        <span aria-hidden="true">›</span>
+        <a href={`/laptops?brand=${d.brand}`}>{d.brand}</a>
+        <span aria-hidden="true">›</span>
+        <span>{d.model}</span>
+      </div>
+    </nav>
+
+    <div class="product-inner">
+      <div class="product-image-panel">
+        <div class="product-img-wrap">
+          <img
+            src={d.image}
+            alt={`${d.brand} ${d.model}`}
+            width="480"
+            height="320"
+            loading="eager"
+          />
+        </div>
+        <div class="trust-badges">
+          <div class="trust-item">✓ Tested &amp; Verified</div>
+          <div class="trust-item">🛡️ 30-Day Warranty</div>
+          <div class="trust-item">🚀 Same-Day Nairobi</div>
+          <div class="trust-item">📲 M-Pesa Accepted</div>
+        </div>
+      </div>
+
+      <div class="product-details">
+        <div class="product-brand-line">
+          <span class="product-brand">{d.brand}</span>
+          {d.tag && <span class="tag" style={tagStyle}>{d.tag}</span>}
+          {d.touch && d.tag !== 'Touchscreen' && <span class="tag" style="background:rgba(168,85,247,0.08);color:#a855f7;border:1px solid rgba(168,85,247,0.15)">Touch</span>}
+        </div>
+
+        <h1 class="product-title">{d.brand} {d.model}</h1>
+
+        <div class="product-price">{fmt(d.price)}</div>
+
+        <div class="product-ctas">
+          <a
+            href={`https://wa.me/254700000000?text=${encodeURIComponent(waText)}`}
+            class="btn-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Order on WhatsApp
+          </a>
+          <a href="tel:+254700000000" class="btn-secondary">Call Us</a>
+        </div>
+
+        <div class="specs-table">
+          <div class="specs-title">Specifications</div>
+          {specs.map(s => (
+            <div class="spec-row-full">
+              <span class="spec-label-full">{s.label}</span>
+              <span class="spec-value-full">{s.value}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="product-description">
+          <Content />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+  <WhatsAppButton message={waText} />
+</BaseLayout>
+
+<style>
+.product-page { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+.breadcrumb { border-bottom: 1px solid var(--bdr); }
+.breadcrumb-inner {
+  padding: 14px 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--dim);
+}
+.breadcrumb-inner a { color: var(--muted); transition: color 0.2s; }
+.breadcrumb-inner a:hover { color: var(--blue-b); }
+
+.product-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  padding: 40px 0 80px;
+}
+
+.product-img-wrap {
+  background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(0,0,0,0.3));
+  border: 1px solid var(--bdr);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-img-wrap img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.5));
+}
+.trust-badges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.trust-item {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--bdr);
+  text-align: center;
+}
+
+.product-brand-line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.product-brand { font-size: 12px; font-weight: 700; color: var(--blue-b); font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.product-title { font-size: clamp(22px, 3vw, 32px); font-weight: 900; letter-spacing: -0.02em; color: var(--text); line-height: 1.2; margin-bottom: 16px; }
+.product-price {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  font-family: var(--mono);
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 24px;
+}
+.product-ctas { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+.product-ctas .btn-primary, .product-ctas .btn-secondary { flex: 1; text-align: center; min-width: 140px; }
+
+.specs-table { background: var(--card); border: 1px solid var(--bdr); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+.specs-title { padding: 14px 18px; font-size: 12px; font-weight: 700; color: var(--blue-b); text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid var(--bdr); font-family: var(--mono); }
+.spec-row-full { display: flex; justify-content: space-between; padding: 10px 18px; border-bottom: 1px solid var(--bdr); }
+.spec-row-full:last-child { border-bottom: none; }
+.spec-label-full { font-size: 13px; color: var(--dim); }
+.spec-value-full { font-size: 13px; color: var(--text); font-family: var(--mono); font-weight: 600; }
+
+.product-description { font-size: 15px; line-height: 1.7; color: var(--muted); }
+.product-description p { margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+  .product-inner { grid-template-columns: 1fr; gap: 24px; }
+  .trust-badges { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
